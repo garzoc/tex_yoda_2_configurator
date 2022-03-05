@@ -1,33 +1,62 @@
 # Analysis for TEX yoda file format
 
-## Know information
-
-1. The TEX file format does not contain a checksums
-2. The first 16 bytes are always the same and doesn't appear contain any key mappings?
-
 ## Open questions
 
-2. Can the key mapping be excluded by not having it in the file, from first glance appears to be the case for fn layer
+1. Can the key mapping be excluded by not having it in the file, from first glance appears to be the case for fn layer
 
-# Codes
+## Binary header
 
-It is speculated that the key codes are derived from their value such as
-> 1. value + 1 = key code on fn layer
-> 2. value + 2 = key code on default layer
-> 3. value + 3 = key code on unknown
+The header appeas to be affect by changes such as adding macro or creating binding on new layers.
 
-It appears that there are currently 4 different keys codes for a single key, will be referring to them layers from now
-on.
+## Key format
+
+### Key map format
+
+Keymaps made up of 16 bytes. It starts with **0x0220** and ends with a two NULL byte(**0x0000**).
+The remaining 4 bytes is the actual key to value map. First two bytes are the key and last two bytes the value.
+```
++---------------------+
+|Start|key |value|end |
++-----+----+-----+----+
+|0220 |1602|0400 |0000|
++---------------------+
+```
+
+The value only appears to be contained within the first byte.
+It is possible that the second byte has another use.
+there are few keys where this does not appear to be the case,
+one appears to be trackpoint speed control.
+
+keys can be disabled by setting the value to **ff00** or somteimes **0000**
+TEST: Disable all fn1 keys
+
+### Layers
+
+The keyboard is made up of multiple layers of which there are 4,
+the **normal** layer and three **function(fn)** layers
+
+The layer is encoded in the second byte of the key, see below:
 
 ```
-+-----+------+---------------------------+
-|Layer| value| Descrption                |
-+-----+------+---------------------------+
-|0    | 0400 | Unkown(affected by macro) |
-|1    | 0401 | fn layer                  |
-|2    | 0402 | normal layer              |
-|3    | 0403 | Unkown(affected by macro) |
-+-----+------+---------------------------+
++-----------+
+|    Key    |
++-----------+
+|key  |layer|
++-----+----+-
+|0x16 |0x01 |
++-----------+
+```
+
+Layers for letter a
+```
++-----+------+--------------+
+|Layer| value| Descrption   |
++-----+------+--------------+
+|0    | 0400 | Normal layer |
+|1    | 0401 | fn 1 layer   |
+|2    | 0402 | fn 2 layer   |
+|3    | 0403 | fn 3 layer   |
++-----+------+--------------+
 ```
 
 It is currently unknown that the purpose is for the third and zero layer.
@@ -44,49 +73,64 @@ However they're both affected differently by macro assignment.
 |fn_q| 1401|      |
 +-----------------+
 ```
-## Key format
-
-### Key map format
-
-Key maps are encoded using 8 bytes. It starts with **0220** and ends with a two NULL byte(**0000**).
-The remaining to bytes is the actual key mapping. The first two bytes is the key and the second two bytes is the value/key it
-should be mapped to.
-```
-+---------------------+
-|Start|key |value|end |
-+-----+----+-----+----+
-|0220 |1602|0400 |0000|
-+---------------------+
-```
-
-The value only appears to be contained withi the first byte.
-It is possible that the second byte has another use.
-there are few keys where this does not appear to be the case, could the be trackpoint speed control?.
 
 ### Profile
 
-The file is divider into 3 profile.
-Beginning of a new profile is indicated by setting the next 16 bytes to the following:
+The binary is divided into 3 profiles. At the the end of each keymap section
+a byte sequence appears start of which is indicated by **0294**.
+From what I can tell this is specifically related to binding keys to the fn<x>
 
  ```
-0294 0200 2046 ffff 0000 0000 0000 0000
++--------------+-----+----+----+----+----+-------------------+
+|Layer|num keys|Fixed|Key1|Key2|key3|key4| Terminating       |
++-----+--------+-----+----+----+----+----+-------------------+
+|0294 |   02   | 00  | 20 | 46 | ff | ff |0000 0000 0000 0000|
++--------------+-------------------------+-------------------+
 ```
+
+There can at most be 4 keys for each **fn** at any given moment all of which have their own designated byte.
+The num keys byte indicate how many keys are set. **0xff** is disabled.
+
+It appear this sequence can be extended when a new fn layer is enabled.
+Then a second sequence is added after the separator.
+
+```
++-------+-----+---+--------+
+| Layer |Fixed|Key|  Term  |
++-------+-----+---+--+-----+
+| 0295  |0100 |0d |ff| ffff|
++-------+-----+---+--+-----+
+```
+
+> 1. 0294 = fn1
+> 2. 0295 = fn2
+> 3. 0296 = fn3
+
+Key is indicating which key that f2 layer action is bound to. Normal key mapping appear to be unaffected
+which would mean that this works as a global override for the key.
+The key does not appear to match the value of the same key used in the key mapping nor does it appear to 
+derived from it.
+
+When bound to `q` the key was **0x05**, but when bound to `w` it was **0d**
 
 Afterwards the key mapping can proceed as normal, starting from the first key.
 
+Note: that it does seem that the first layer must always exist and if there are no keys mapped
+it should default to the two keys **4f4e**
+
+#### Bugs?
+> Keys such as the middle mouse are a bit weird, when alone is uses 2 bytes(really only the first 12 bit)
+> but when other keys are added it uses just a single byte encoding. And this only occurs when the key is bound to **fn1**
+> **Possible bug?**
+
 ### Macros
 
-Macros mapping are stored at end of the key map sections indicated by the following bytes
-
-```
- 0294 0200 2046 ffff 0000 0000 0000 0000
-```
-
+Macros sequences are stored at the end of the third and final profile
 The macro byte sequence does not have any byte that initializes the sequence it simply starts at the end of the key mapping section.
-It does however have 4 terminating bytes **00fc c800** and a two separator bytes **5a00**.
+It does however have termination sequence **00fc c800** and a seperator **5a00**.
 
-A two bytes are used to indicated the key and action. Actions being press or release.
-As mentioned in previous section the value or which key to press is only indicated by the first byte.
+Only two bytes are used to indicated the key and action. Actions being press or release.
+The key is only indicated by the first byte.
 The second byte is used to indicated the action. A key press for the letter s would be **163c**
 and release would then be **165c**. 
 
@@ -95,14 +139,10 @@ Below is a single macro byte sequence for pressing the key `s`
 163c 5a00 165c 5a00 00fc c800
 ```
 
-When configuring a macro the normal key value both the normal and unknown layer should be set to zero does not affect the fn layer.
-Note that the test was done by binding a macro to the default layer which perhaps why the fn layer was not affected.
-I assume this reset is to prevent a macro from calling itself infinitely.
-
-The zero layer will be changed
-
-The first two bytes are changed to **0218** from **0220** && the key bytes are set to zero
-The remaining byte of the value are changes to **3c**, finally the terminating bytes are set to "0100"
+When apply a micro binding for a key of a given layer the first two bytes are
+changed to **0218** from **0220** && the key bytes are zeroed The
+remaining bytes of the value are changes to  **<key byte>3c**, finally the terminating
+bytes are set to "0100" it is possible that is referencing the macro sequence.
 
 ```
 Layer 0 for key s
@@ -112,7 +152,10 @@ Layer 0 for key s
 |0218 |0000|043c |0100|
 +---------------------+
 ```
-It does seem that a single macro sequence appears multiple times, which could indicated that it is possible to configure macro sequences per profile.
 
-For every macro added there appears to be some changes made to the start of the file however it is not now how this is done at the moment
+It does seem that a single macro sequence appears multiple times, which could
+indicated that it is possible to configure macro sequences per profile.
+
+For every macro added there appears to be some changes made to the start of the
+file however it is not now how this is done at the moment
 
