@@ -8,6 +8,20 @@
 
 The header appeas to be affect by changes such as adding macro or creating binding on new layers.
 
+The binary header appear to be made up 32 bytes. It always start with `0x4359 0x4649 0x0000`(CYFI)
+The next byte appear to be a macro counter adding +3 for every macro added, which is immediately followed
+by a NULL byte. From the remaing byte in the header we see an emerging pattern of:
+```
++------+-----+-----+-----+
+|key   |fixed|value|fixed|
++------+-----+-----+-----+
+| 0001 |0000 |2000 |0000 |
++------+-----+-----+-----+
+```
+
+These pattern will repeat three times. The key will increment by 1 each time.
+Currently uncertain what the values represent. Possibly related to the number of bytes in the file?
+
 ## Key format
 
 ### Key map format
@@ -94,6 +108,7 @@ The num keys byte indicate how many keys are set. **0xff** is disabled.
 It appear this sequence can be extended when a new fn layer is enabled.
 Then a second sequence is added after the separator.
 
+TODO Fix below table as it is incorrect
 ```
 +-------+-----+---+--------+
 | Layer |Fixed|Key|  Term  |
@@ -122,6 +137,15 @@ it should default to the two keys **4f4e**
 > Keys such as the middle mouse are a bit weird, when alone is uses 2 bytes(really only the first 12 bit)
 > but when other keys are added it uses just a single byte encoding. And this only occurs when the key is bound to **fn1**
 > **Possible bug?**
+
+#### FN key binding and binary header
+
+The binary header is made up of 32 bytes. Depending on which profile you enable the fn layer on, it will affect the binary header differently.
+
+1. Enabling fn layer on **profile3** has no affect on the binary header
+2. Enabling fn layer on **profile2** will only affect the 29th byte incrementing the default value of `0x40` by the number of bytes added by each enabled fn layer
+   8 or 16
+3. Enabling fn layer on **profile1** will do the same thing as for profile2 but also for the 21th byte.
 
 ### Macros
 

@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-#no_macro_header = bytearray([0x4359, 0x4649])
-#print("hello")
 
 class TexBinaryBuilder:
 
@@ -50,6 +48,7 @@ class TexBinaryBuilder:
         "0": 0x2700,
 
         # Unmappable key
+
         # Keys that can only be applied as a value
 
         "f1": 0x3a00,
@@ -139,6 +138,14 @@ class TexBinaryBuilder:
         "0xe300": 0xe300,
         "0xe500": 0xe500,
         "0xe600": 0xe600,
+
+        # Specialized keybindings only for binding FN layer switcher to keys
+        "FN_q": 0x05,
+        "FN_w": 0x0d,
+        "FN_fn": 0x20,           # ??
+        "FN_middle_mouse": 0x46, # ??
+        # This is the layer that we want to switch to, cannot be used as a value
+        "FN_FN1":0x0294,
     }
 
     def __init__(self):
@@ -150,35 +157,28 @@ class TexBinaryBuilder:
             0x35, # Unknown what these keys are
         ] + list(range(0x3a, 0x65)) + list(range(0x66, 0xc8)) + list(range(0xcb, 0xe0))
 
-        self.endOfProfile = bytearray([
-            0x02, 0x94 ,0x02, 0x00, 0x20, 0x46 ,0xff ,0xff,
-            0x00, 0x00 ,0x00, 0x00 ,0x00, 0x00 ,0x00, 0x00
-        ])
+        self.binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
 
-        # Currently not known how macros affect the binary file header but it only seems change based
-        # on the number of macros so use prebuilt headers for now
-        self.no_macro_header = bytearray([
-            0x43, 0x59, 0x46, 0x49, 0x00, 0x00, 0x03, 0x00, 0x00, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00,
-            0x00, 0x02 ,0x00, 0x00, 0x30, 0x08, 0x00, 0x00, 0x00, 0x03 ,0x00, 0x00, 0x40, 0x10, 0x00, 0x00
-        ])
-
-        # Define of the naming scheme for every layer of all three profiles
-        # and add minor default configuration
+        # Define the configuration scheme and include thedefault configuration
         self.configs = {
-            "profile1_fn": {},
-            "profile1_normal" : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile1_third"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile1_macro"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
-            "profile2_fn": {},
-            "profile2_normal" : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile2_third"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile2_macro"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
-            "profile3_fn": {},
-            "profile3_normal" : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile3_third"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
-            "profile3_macro"  : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
+            "profile1_normal": {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile1_fn1"   : {},
+            "profile1_fn2"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile1_fn3"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
+            "profile1_fn_layer" : {"FN_FN1": ["FN_fn", "FN_middle_mouse"]}, # Default configuration  when enabling the FN1 layer
+            "profile2_normal": {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile2_fn1"   : {},
+            "profile2_fn2"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile2_fn3"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
+            "profile2_fn_layer" : {"FN_FN1": ["FN_fn", "FN_middle_mouse"]}, # Default configuration  when enabling the FN1 layer
+            "profile3_normal": {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile3_fn1"   : {},                                           # Fn1 is strangely ordered in the default Config
+            "profile3_fn2"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
+            "profile3_fn3"   : {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]}, # Calling Macro for now as it is affected by macro changes
+            "profile3_fn_layer" : {"FN_FN1": ["FN_fn", "FN_middle_mouse"]}, # Default configuration  when enabling the FN1 layer
         }
 
+        # Fn1 defalut configuration
         prebuiltFnLayer = {
             "a": "left",
             "b": "vol+",
@@ -219,18 +219,20 @@ class TexBinaryBuilder:
             "0x3800": "0x9301"
         }
 
+        # Prepare the default FN1 layer
         for i in range(1, 4):
             for key, value in prebuiltFnLayer.items():
-                self.addConfigEntry("profile{}_fn".format(i), key, value)
+                self.addConfigEntry("profile{}_fn1".format(i), key, value)
 
     @staticmethod
     def keyCode(*keys):
+        getKey = lambda key : TexBinaryBuilder.keymap[key]  if key in TexBinaryBuilder.keymap else None
+        if len(keys) == 1:
+            return getKey(*keys)
+
         codeList = []
         for key in keys:
-            if key in TexBinaryBuilder.keymap:
-                codeList.append(TexBinaryBuilder.keymap[key])
-            else:
-                codeList.append(None)
+            codeList.append(getKey(key))
         return codeList
 
     def getConfig(self, configName):
@@ -268,25 +270,54 @@ class TexBinaryBuilder:
             if i not in self.unsupportedKeys:
                 yield i
 
+    def getHeaderData(self, config={}):
+        yield [0x20, 0x00]
+
+        # Very hacky expects that there is always an FN layer active
+        count = (len(self.getConfig("profile1_fn_layer")) - 1) * 8
+        yield [0x30 + count, 0x08]
+
+        # Very hacky expects that there is always an FN layer active
+        # This is applies both for profile 1 and 2
+        count += (len(self.getConfig("profile2_fn_layer")) - 1) * 8
+        yield [0x40, 0x10]
+
+
     def binraryGenerate(self, filename, config):
 
         with open(filename, "wb") as file:
-            yield "File header"
-            file.write(self.no_macro_header)
+
+            yield "Binary header"
+            file.write(self.binary_header)
+            # Writing macro counter
+            macroCount = 1
+            file.write(bytearray([0x03 * macroCount, 0x00]))
+
+            headerData = self.getHeaderData()
+            # Write the Remaining header sequence
+            for i in range(1, 4):
+                data = headerData.send(None)
+                file.write(bytearray([0x00, i, 0x00, 0x00, *data, 0x00, 0x00]))
+
+            # There are still a lot of unknown when it comes to creating the binary header
+            # Such as how macros changes the information or fn layer changes
+
+            # Iterate over each profile
             for i in range(1, 4):
 
                 yield
-                config = yield "profile{}_fn".format(i)
+                config = yield "profile{}_fn1".format(i)
 
                 for key in self.keyIterator():
                     data = self.create_key_mapping(key, 0x01, config, None, False)
                     if (data):
                         file.write(data)
 
-                yield
-                config = yield "Unordered keys"
 
-                # It is not known why in the default configuration the fn_keys are out of order.
+# ======================================
+                yield
+                config = yield "profile{} fn1 Unordered keys".format(i)
+                # It is not known why in the default configuration the FN1 layer key are out of order.
                 # It would probably be fine to map the keys in any order.
                 # This could be removed in the future but keeping it for now to make it easier for testing
                 unorderedFnKeys = [
@@ -298,37 +329,48 @@ class TexBinaryBuilder:
 
                 for key in unorderedFnKeys:
                     # Reconfigured keys are ordered normally
-                    if self.keyCode(key)[0] not in config:
-                        keyByte = list(self.keyCode(key)[0].to_bytes(2, "big"))[0]
+                    if self.keyCode(key) not in config:
+                        keyByte = list(self.keyCode(key).to_bytes(2, "big"))[0]
                         if keyByte == 0x65:
                             file.write(self.create_key_mapping(keyByte, 0x01, None, 0xe7))
                         elif keyByte == 0xe7:
                             file.write(self.create_key_mapping(keyByte, 0x01, None, 0xe6))
                         else:
                             file.write(self.create_key_mapping(keyByte, 0x01, None))
+#======================================
 
                 yield
-                config = yield "profile{}_normal".format(i)
+                config = yield "profile{}_fn2".format(i)
 
                 for key in self.keyIterator():
                     file.write(self.create_key_mapping(key, 0x02, config))
 
                 yield
-                config = yield "profile{}_third".format(i)
+                config = yield "profile{}_fn3".format(i)
 
                 for key in self.keyIterator():
                     file.write(self.create_key_mapping(key, 0x03, config))
 
                 yield
-                config = yield "profile{}_macro".format(i)
+                config = yield "profile{}_normal".format(i)
 
                 for key in self.keyIterator():
                     file.write(self.create_key_mapping(key, 0x00, config))
 
                 yield
-                config = yield "profile {} done".format(i)
 
-                file.write(self.endOfProfile)
+                config = yield "profile{}_fn_layer".format(i)
+
+                for layer, keys in config.items():
+                    keyCode = self.keyCode(layer)
+                    file.write(bytearray(list(keyCode.to_bytes(2, "big"))))
+                    file.write(bytearray([len(keys), 0x00]))
+                    file.write(bytearray([self.keyCode(key) for key in keys]))
+                    file.write(bytearray([0xff] * (4 - len(keys))))
+                    file.write(bytearray([0x00] * 8))
+
+                yield
+                config = yield "profile {} done".format(i)
 
             # Add remaining bytes to binary file
             for i in range(0, 5080):
