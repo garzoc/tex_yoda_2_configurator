@@ -159,7 +159,7 @@ class TexBinaryBuilder:
 
         self.binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
 
-        # Define the configuration scheme and include thedefault configuration
+        # Define the configuration scheme and include the default configuration
         self.configs = {
             "profile1_normal": {0x6500: [0xe7, 0x00], 0xe700: [0xe6, 0x00]},
             "profile1_fn1"   : {},
@@ -283,7 +283,7 @@ class TexBinaryBuilder:
         yield [0x40, 0x10]
 
 
-    def binraryGenerate(self, filename, config):
+    def binaryGenerate(self, filename, config):
 
         with open(filename, "wb") as file:
 
@@ -387,7 +387,7 @@ def init():
     #texBuilder.setConfig({"profile1_fn": {"q": "s"}})
     #texBuilder.setConfig({"profile1_fn": {"f": "s"}})
 
-    generator = texBuilder.binraryGenerate("test.txt", "step")
+    generator = texBuilder.binaryGenerate("test.txt", "step")
 
     #https://stackoverflow.com/questions/22028903/python-generator-send-dont-yield-a-new-value-after-a-send
     for step in generator:

@@ -26,17 +26,17 @@ Currently uncertain what the values represent. Possibly related to the number of
 
 ### Key map format
 
-Keymaps made up of 16 bytes. It starts with **0x0220** and ends with a two NULL byte(**0x0000**).
-The remaining 4 bytes is the actual key to value map. First two bytes are the key and last two bytes the value.
+Key bindings consists of 16 bytes. Beginning with **0x0220** and ends with two NULL bytes(**0x0000**).
+The remaining 4 bytes is the hardware key and value. The first two bytes are the hardware key and last the value.
 ```
-+---------------------+
-|Start|key |value|end |
-+-----+----+-----+----+
-|0220 |1602|0400 |0000|
-+---------------------+
++-------------------------+
+|Preamble |key |value|end |
++---------+----+-----+----+
+|0220     |1602|0400 |0000|
++-------------------------+
 ```
 
-The value only appears to be contained within the first byte.
+The value to which the hardware key binds only appears to be contained within the first byte.
 It is possible that the second byte has another use.
 there are few keys where this does not appear to be the case,
 one appears to be trackpoint speed control.
@@ -46,10 +46,8 @@ TEST: Disable all fn1 keys
 
 ### Layers
 
-The keyboard is made up of multiple layers of which there are 4,
-the **normal** layer and three **function(fn)** layers
-
-The layer is encoded in the second byte of the key, see below:
+The hardware keys can be configured with up to 4 different layers 3 FN layers the normal layer.
+The hardware key is made up of two parts, the actual key and the layer, see below:
 
 ```
 +-----------+
@@ -61,7 +59,7 @@ The layer is encoded in the second byte of the key, see below:
 +-----------+
 ```
 
-Layers for letter a
+Layers for letter **a** on standard ansi-US layout.
 ```
 +-----+------+--------------+
 |Layer| value| Descrption   |
@@ -72,10 +70,6 @@ Layers for letter a
 |3    | 0403 | fn 3 layer   |
 +-----+------+--------------+
 ```
-
-It is currently unknown that the purpose is for the third and zero layer.
-However they're both affected differently by macro assignment.
-
 
 ```
 +----+-----+------+
@@ -90,16 +84,18 @@ However they're both affected differently by macro assignment.
 
 ### Profile
 
-The binary is divided into 3 profiles. At the the end of each keymap section
-a byte sequence appears start of which is indicated by **0294**.
-From what I can tell this is specifically related to binding keys to the fn<x>
+The binary is divided into 3 profiles. At the the end of each keymap section of a profile
+there is an FN lay configuration for which hardware keys that can be used to switch to a specific FN layer,
+The sequence begins with three fixed bytes **0x029**.
+This is then followed by a single byte indicating which layer to switch to when a given key is pressed, starting at
+**0x4**
 
  ```
-+--------------+-----+----+----+----+----+-------------------+
-|Layer|num keys|Fixed|Key1|Key2|key3|key4| Terminating       |
-+-----+--------+-----+----+----+----+----+-------------------+
-|0294 |   02   | 00  | 20 | 46 | ff | ff |0000 0000 0000 0000|
-+--------------+-------------------------+-------------------+
++---------+---------+----------+---------+------+------+------+------+---------------------------+
+|Preamble |FN Layer |num keys  |Delimiter|Key1  |Key2  |key3  |key4  | Terminating               |
++---------+---------+----------+---------+------+------+------+------+---------------------------+
+|0x029    | 0x4     |   0x02   | 0x00    | 0x20 | 0x46 | 0xff | 0xff |0x0000 0x0000 0x0000 0x0000|
++---------+---------+----------+---------+------+------+------+------+---------------------------+
 ```
 
 There can at most be 4 keys for each **fn** at any given moment all of which have their own designated byte.
@@ -108,30 +104,23 @@ The num keys byte indicate how many keys are set. **0xff** is disabled.
 It appear this sequence can be extended when a new fn layer is enabled.
 Then a second sequence is added after the separator.
 
-TODO Fix below table as it is incorrect
-```
-+-------+-----+---+--------+
-| Layer |Fixed|Key|  Term  |
-+-------+-----+---+--+-----+
-| 0295  |0100 |0d |ff| ffff|
-+-------+-----+---+--+-----+
-```
 
 > 1. 0294 = fn1
 > 2. 0295 = fn2
 > 3. 0296 = fn3
 
-Key is indicating which key that f2 layer action is bound to. Normal key mapping appear to be unaffected
+Key is indicating which key that FN2 layer action is bound to. Normal key mappings appear to be unaffected
 which would mean that this works as a global override for the key.
-The key does not appear to match the value of the same key used in the key mapping nor does it appear to 
+
+The key does not appear to match the value of the same hardware key used in the normal key mapping nor does it appear to 
 derived from it.
 
 When bound to `q` the key was **0x05**, but when bound to `w` it was **0d**
 
 Afterwards the key mapping can proceed as normal, starting from the first key.
 
-Note: that it does seem that the first layer must always exist and if there are no keys mapped
-it should default to the two keys **4f4e**
+> **Note**: that it does seem that the first layer must always exist and if there are no keys mapped
+> it should default to the two keys **4f4e**
 
 #### Bugs?
 > Keys such as the middle mouse are a bit weird, when alone is uses 2 bytes(really only the first 12 bit)
