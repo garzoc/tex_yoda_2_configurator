@@ -6,28 +6,33 @@
 
 ## Binary header
 
-The header appeas to be affect by changes such as adding macro or creating binding on new layers.
+~~The header appears to be affected by changes such as adding macro or creating binding on new layers.~~
 
-The binary header appear to be made up 32 bytes. It always start with `0x4359 0x4649 0x0000`(CYFI)
-The next byte appear to be a macro counter adding +3 for every macro added, which is immediately followed
-by a NULL byte. From the remaing byte in the header we see an emerging pattern of:
-```
-+------+-----+-----+-----+
-|key   |fixed|value|fixed|
-+------+-----+-----+-----+
-| 0001 |0000 |2000 |0000 |
-+------+-----+-----+-----+
-```
+The binary always start with `0x4359 0x4649 0x0000`(CYFI), The next byte appears to be counting the number of
+8 byte sequences, before the keymap section of the first profile. Basically configuration related to the profiles.
+> The byte after that always seems to remain zero, warrants further investigation.
 
-These pattern will repeat three times. The key will increment by 1 each time.
-Currently uncertain what the values represent. Possibly related to the number of bytes in the file?
+After the header we find some configuration related to the keyboard profiles, currently supports max 3 profiles?
+For each profile we have 8 bytes that marks the starting address of their respective key map section 
+Address is stored as 16 bit little endian(LE)
+
+```
++---------+-------+--------------------------+-------+
+|Profile  |fixed  |Profile Start Address(LE) |fixed  |
++---------+-------+--------------------------+-------+
+| 0x0001  |0x0000 |0x2000                    |0x0000 |
++---------+-------+--------------------------+-------+
+```
 
 ## Key format
 
+After the Binary header there is the key configuration for each profile.
+Each profile has a key map section and an FN layer switching key binding section
+
 ### Key map format
 
-Key bindings consists of 16 bytes. Beginning with **0x0220** and ends with two NULL bytes(**0x0000**).
-The remaining 4 bytes is the hardware key and value. The first two bytes are the hardware key and last the value.
+Key bindings consists of 8 bytes. Beginning with **0x0220** and ends with two NULL bytes(**0x0000**).
+The remaining 4 bytes is the hardware key and value. The first two bytes are the hardware key and last the value/action.
 ```
 +-------------------------+
 |Preamble |key |value|end |
@@ -36,17 +41,15 @@ The remaining 4 bytes is the hardware key and value. The first two bytes are the
 +-------------------------+
 ```
 
-The value to which the hardware key binds only appears to be contained within the first byte.
+The value to which the hardware key binds to only appears to be contained within the first byte.
 It is possible that the second byte has another use.
-there are few keys where this does not appear to be the case,
+There are few keys where this does not appear to be the case,
 one appears to be trackpoint speed control.
 
 keys can be disabled by setting the value to **ff00** or somteimes **0000**
 TEST: Disable all fn1 keys
 
-### Layers
-
-The hardware keys can be configured with up to 4 different layers 3 FN layers the normal layer.
+The hardware keys can be configured with up to 4 different values, one for each layer, 3 FN layers and the normal layer.
 The hardware key is made up of two parts, the actual key and the layer, see below:
 
 ```
@@ -82,13 +85,14 @@ Layers for letter **a** on standard ansi-US layout.
 +-----------------+
 ```
 
-### Profile
+### FN Layers
 
-The binary is divided into 3 profiles. At the the end of each keymap section of a profile
-there is an FN lay configuration for which hardware keys that can be used to switch to a specific FN layer,
-The sequence begins with three fixed bytes **0x029**.
+At the the end of each keymap section of a profile there is an FN lay configuration for which hardware keys that can be
+used to switch to a specific FN layer, The sequence begins with three fixed bytes **0x029**.
 This is then followed by a single byte indicating which layer to switch to when a given key is pressed, starting at
 **0x4**
+
+> Note: At the moment we know it is possible to configure up to 3 FN layers
 
  ```
 +---------+---------+----------+---------+------+------+------+------+---------------------------+
@@ -127,14 +131,6 @@ Afterwards the key mapping can proceed as normal, starting from the first key.
 > but when other keys are added it uses just a single byte encoding. And this only occurs when the key is bound to **fn1**
 > **Possible bug?**
 
-#### FN key binding and binary header
-
-The binary header is made up of 32 bytes. Depending on which profile you enable the fn layer on, it will affect the binary header differently.
-
-1. Enabling fn layer on **profile3** has no affect on the binary header
-2. Enabling fn layer on **profile2** will only affect the 29th byte incrementing the default value of `0x40` by the number of bytes added by each enabled fn layer
-   8 or 16
-3. Enabling fn layer on **profile1** will do the same thing as for profile2 but also for the 21th byte.
 
 ### Macros
 
