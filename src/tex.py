@@ -6,24 +6,25 @@ from enum import Enum
 # https://stackoverflow.com/questions/58608361/string-based-enum-in-python
 class TexConf(int, Enum):
     NORMAL = 0
-    FN1  = 1
+    FN1 = 1
     FN2 = 2
     FN3 = 3
     FN_LAYER1 = 4
     FN_LAYER2 = 5
     FN_LAYER3 = 6
 
+
 class TexConfigurator:
     keymap = {
         "[": 0x2f00,
         "\\": 0x3100,
         "]": 0x3000,
-        "a": 0x0400,
-        "b": 0x0500,
-        "c": 0x0600,
-        "d": 0x0700,
-        "e": 0x0800,
-        "f": 0x0900,
+        "a": 0x0400,  # 00000100: 00110100
+        "b": 0x0500,  # 00000101: 00000001
+        "c": 0x0600,  # 00000110: 00110010
+        "d": 0x0700,  # 00000111: 00000011
+        "e": 0x0800,  # 00001000: 00010101
+        "f": 0x0900,  # 00001001: 00001011
         "g": 0x0a00,
         "h": 0x0b00,
         "i": 0x0c00,
@@ -151,8 +152,32 @@ class TexConfigurator:
         "0xe600": 0xe600,
 
         # Specialized keybindings only for binding FN layer switcher to keys
+        "FN_a": 0x34,
+        "FN_b": 0x01,
+        "FN_c": 0x32,
+        "FN_d": 0x03,
+        "FN_e": 0x15,
+        "FN_f": 0x0b,
+        "FN_g": 0x13,
+        "FN_h": 0x1b,
+        "FN_i": 0x3d,
+        "FN_j": 0x23,
+        "FN_k": 0x2b,
+        "FN_l": 0x33,
+        "FN_m": 0x11,
+        "FN_n": 0x09,
+        "FN_o": 0x04,
+        "FN_p": 0x0c,
         "FN_q": 0x05,
+        "FN_r": 0x1d,
+        "FN_s": 0x3c,
+        "FN_t": 0x25,
+        "FN_u": 0x35,
+        "FN_v": 0x3a,
         "FN_w": 0x0d,
+        "FN_x": 0x2a,
+        "FN_y": 0x2d,
+        "FN_z": 0x22,
         "FN_fn": 0x20,           # ??
         "FN_middle_mouse": 0x46,  # ??
     }
@@ -200,11 +225,11 @@ class TexConfigurator:
         # Keys that does not exist within the default TEX binary file
         # Leaving them here until it can be determined what they are.
         self.unsupportedKeys = [
-            0x32, # Unknown what these keys are
-            0x35, # Unknown what these keys are
+            0x32,  # Unknown what these keys are
+            0x35,  # Unknown what these keys are
         ] + list(range(0x3a, 0x65)) + list(range(0x66, 0xc8)) + list(range(0xcb, 0xe0))
 
-        #self.binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
+        # self.binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
 
 
         # Fn1 defalut configuration
@@ -253,25 +278,19 @@ class TexConfigurator:
             for key, value in prebuiltFnLayer.items():
                 self.addConfigEntry(i, TexConf.FN1, key, value)
 
-    def getProfileSection(self, profile, section):
-        return self.profiles[profile].get(section) or {}
-
-    @staticmethod
-    def keyCode(*keys):
-        getKey = lambda *keys : (TexConfigurator.keymap[key] if key in TexConfigurator.keymap else None for key in [*keys])
+    def keyCode(self, *keys):
+        getKey = lambda *keys: (self.keymap[key] if key in self.keymap else None for key in [*keys])
         return getKey(*keys)
 
+    def addConfigEntry(self, profile_idx, layer: TexConf, key: str, value: str):
+        profile: dict = self.profiles[profile_idx - 1]
+        layer_conf = profile["layers"].get(layer)
 
-    def addConfigEntry(self, profile, section, key, value):
-        keyCode, valueCode = TexConfigurator.keyCode(key, value)
-        if not all([keyCode, value]):
+        keyCode, valueCode = self.keyCode(key, value)
+        if not keyCode or not valueCode or not all([keyCode, value]):
             print(f"Adding entry for {key} failed")
         as_bytes = valueCode.to_bytes(2, "big")
-        self.profiles[profile].get("layers").get(section)[keyCode] = list(as_bytes)
-
-    @staticmethod
-    def keyIsConfigurable(key):
-        return key in TexConfigurator.keymap
+        layer_conf[keyCode] = list(as_bytes)
 
     def keyIterator(self):
         for i in range(0x04, 0xe8):
@@ -287,29 +306,22 @@ class TexConfigurator:
     def fnCount(self, profile):
         return len(self.profiles[profile]["fn"])
 
-class TexBinaryBuilder:
-    binary_header        = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
-    ENTRY_SIZE           = 8 # Number of bytes for a standard entry
-    FN_LAYER_CONFIG_SIZE = 16 # Number of bytes for a FN config entry
 
-    def __init__(self, config):
+class TexBinaryBuilder:
+    binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
+    ENTRY_SIZE = 8  # Number of bytes for a standard entry
+    FN_LAYER_CONFIG_SIZE = 16  # Number of bytes for a FN config entry
+
+    def __init__(self, config: TexConfigurator):
         self.texConfig: TexConfigurator = config  # TexConfigurator
 
-    def getConfig(self, name):
-        return self.texConfig.get(name) or {}
+    def config(self) -> TexConfigurator:
+        return self.texConfig
 
-    def applyConfig(self, config):
-        for index, profile in enumerate(config):                                     # Iterate over the list of layer configurations
-            for sectionName, section in profile.layers.items():                                                  # Go through each seaction
-                if all([TexConfigurator.keyIsConfigurable(key) for key in section]): # Can the keys be mapped to?
-                    # Iterate over keys in the new config
-                    for key, value in section.items():
-                        self.texConfig.addConfigEntry(index, sectionName, key, value)
-
-    def create_key_mapping(self, key, profile_idx: int, layer_idx: int, value=None, default=True):
+    def get_mapped_value(self, key, profile_idx: int, layer_idx: int, value=None, default=True):
         if value is None:
             value = key
-        profile: dict = self.texConfig.profiles[profile_idx]
+        profile: dict = self.config().profiles[profile_idx]
         profile_layer = profile["layers"][TexConf(layer_idx)]
         config_key = (key << 8)
         if(type(profile_layer) is dict and config_key in profile_layer):
@@ -320,37 +332,34 @@ class TexBinaryBuilder:
         else:
             return None
 
-    def getHeaderData(self, config={}):
-        yield [0x20, 0x00]
-
-        # Very hacky expects that there is always an FN layer active
-        count = (len(self.getConfig("profile1_fn_layer")) - 1) * 8
-        yield [0x30 + count, 0x08]
-
-        # Very hacky expects that there is always an FN layer active
-        # This is applies both for profile 1 and 2
-        count += (len(self.getConfig("profile2_fn_layer")) - 1) * 8
-        yield [0x40, 0x10]
-
-    def getProfileAddress(self, profile):
+    def get_profile_address(self, profile):
         header = len(TexBinaryBuilder.binary_header) + 2
-        profiles = TexBinaryBuilder.ENTRY_SIZE * len(self.texConfig.profiles)
-        macros = TexBinaryBuilder.ENTRY_SIZE * 0
+        profiles = TexBinaryBuilder.ENTRY_SIZE * len(self.config().profiles)
+        macros = TexBinaryBuilder.ENTRY_SIZE * 0  # This would be the number of macros that we have
         length = header + profiles + macros
         for i in range(0, profile):
-            length += (self.texConfig.profileLen() * self.texConfig.layerCount(profile) * TexBinaryBuilder.ENTRY_SIZE)
-            length += self.texConfig.fnCount(profile) * TexBinaryBuilder.FN_LAYER_CONFIG_SIZE
+            length += (self.config().profileLen() * self.config().layerCount(profile) * TexBinaryBuilder.ENTRY_SIZE)
+            length += self.config().fnCount(profile) * TexBinaryBuilder.FN_LAYER_CONFIG_SIZE
 
         return length
 
-    def writeProfileHeaderMetaDataField(self, profile_idx) -> bytearray:
-        profile_section_byte_offset = self.getProfileAddress(profile_idx - 1)
+    def gen_profile_and_macro_meta_data(self, profile_idx) -> bytearray:
+        """
+            Write meta data in the header.
+            This includes the starting address of each profile.
+            As well as the starting address of any configured macros.
+            Macros are not configured per profile.
+        """
+        profile_section_byte_offset = self.get_profile_address(profile_idx - 1)
         profile_field_key = bytearray([0x00, profile_idx])
         seperator = bytearray([0x00, 0x00])
         return profile_field_key + seperator + bytearray(profile_section_byte_offset.to_bytes(2, "little")) + seperator
 
-    def writeFNLayerSwitchInformation(self, profile_idx) -> bytearray:
-        profile: dict = self.texConfig.profiles[profile_idx]
+    def gen_fn_conf(self, profile_idx) -> bytearray:
+        """
+            Generate the configuration of keys that are used to change the current FN layer
+        """
+        profile: dict = self.config().profiles[profile_idx]
         fn_conf = profile["fn"]
         print(fn_conf)
         fn_byte_array = bytearray()
@@ -363,7 +372,7 @@ class TexBinaryBuilder:
 
             start = bytearray([0x02, 0x94 + i])
             key_count = bytearray([0x00 + used_keys, 0x00])
-            keys = bytearray([self.texConfig.keymap[x] for x in fn_layer])
+            keys = bytearray([self.config().keymap[x] for x in fn_layer])
             padding = bytearray([0xFF] * unsued)
             end = bytearray([0x00] * 8)
             fn_byte_array += start + key_count + keys + padding + end
@@ -372,7 +381,7 @@ class TexBinaryBuilder:
     def writeHeadMetaDataEntriesCount(self):
         """
         This stores the number of meta data fields that is present in the header section.
-        Fields that can be found here is the profile sectation starting address as well as the starting adress
+        Fields that can be found here is the profile section starting address as well as the starting address
         of any macro present in the footer.
 
         Profile Data
@@ -381,7 +390,7 @@ class TexBinaryBuilder:
         Macro data
         0101 0000 6818 0000
 
-        There is currently no support for macros, and we'll always assume that there are thee profiles.
+        There is currently no support for macros, and we'll always assume that there are always three profiles.
 
         It might be that this counter is just stored in little endian
         """
@@ -396,33 +405,30 @@ class TexBinaryBuilder:
 
             file.write(self.writeHeadMetaDataEntriesCount())
 
-            for index, profile in enumerate(self.texConfig.profiles):
-                length = self.getProfileAddress(index)
+            for index, profile in enumerate(self.config().profiles):
+                length = self.get_profile_address(index)
                 print(f"Hej {hex(length)}")
-                file.write(self.writeProfileHeaderMetaDataField(index + 1))
+                file.write(self.gen_profile_and_macro_meta_data(index + 1))
 
-            for profile_idx, profile in enumerate(self.texConfig.profiles):
+            for profile_idx, profile in enumerate(self.config().profiles):
                 for i in range(1, 5):
                     print(i % 4)
-                    for key in self.texConfig.keyIterator():
-                        data = self.create_key_mapping(key, profile_idx, i % 4)
+                    for key in self.config().keyIterator():
+                        data = self.get_mapped_value(key, profile_idx, i % 4)
                         if (data):
                             file.write(data)
-                file.write(self.writeFNLayerSwitchInformation(profile_idx))
+                file.write(self.gen_fn_conf(profile_idx))
 
-            for conf in [x for x in TexConf if "fn_layer"]:
-                print(conf)
-            file.write(bytearray([0xff] * (317 * 16 + 4)))
+            file.write(bytearray([0xff] * (317 * 16 + 8)))
 
 
 def init():
     texConfiguration = TexConfigurator()
+    texConfiguration.addConfigEntry(1, TexConf.NORMAL, "b", "vol-")
     texBuilder = TexBinaryBuilder(texConfiguration)
-    #texBuilder.setConfig({"profile1_normal": {"s": "a"}})
-    #texBuilder.setConfig({"profile1_fn": {"q": "s"}})
-    #texBuilder.setConfig({"profile1_fn": {"f": "s"}})
 
-    texBuilder.binaryGenerate("test.txt")
+    texBuilder.binaryGenerate("KEYMAP.TEX")
+
 
 if __name__ == "__main__":
     init()

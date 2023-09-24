@@ -11,15 +11,15 @@ use when working with some of their other keyboard models.
 
 ## Repo structure
 
-1. Information on the binary format can be found under the docs folder.
-2. Binary files used for analysis is found under tex/
+1. ./doc : Information on the binary format.
+2. ./tex : Binary files used for analysis
 
 
 Feature
 
 - [x] Basic configuration
-- [] Multi layout support
-- [] External config-file
-- [] Macro support
-- [] Automatic testing
-- [] GUI
+- [ ] Multi layout support
+- [ ] External config-file
+- [ ] Macro support
+- [ ] Automatic testing
+- [ ] GUI
