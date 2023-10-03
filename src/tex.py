@@ -47,6 +47,15 @@ class TexConfigurator:
         "z": 0x1d00,
         "-": 0x2d00,
         "=": 0x2e00,
+        "spacebar": 0x2c00,
+        "capslock": 0x3900,
+        "backspace": 0x2a00,
+        "control": 0xe000,
+        "esc": 0x2900,
+        "left_shift": 0xe100,
+        "right_shift": 0xe500,
+        "enter": 0x2800,
+        ".": 0x3700,
 
         # Numbers
         "1": 0x1e00,
