@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from enum import Enum
 
@@ -313,6 +313,9 @@ class TexConfigurator:
         return len(self.profiles[profile]["layers"])
 
     def fnCount(self, profile):
+        """
+        Get the current number of enabled fn layers.
+        """
         return len(self.profiles[profile]["fn"])
 
 
@@ -333,7 +336,7 @@ class TexBinaryBuilder:
         profile: dict = self.config().profiles[profile_idx]
         profile_layer = profile["layers"][TexConf(layer_idx)]
         config_key = (key << 8)
-        if(type(profile_layer) is dict and config_key in profile_layer):
+        if (type(profile_layer) is dict and config_key in profile_layer):
             return bytearray([0x02, 0x20, key, layer_idx] + profile_layer[config_key] + [0x00, 0x00])
         elif default:
             # With not config available fallback on default value
@@ -341,14 +344,21 @@ class TexBinaryBuilder:
         else:
             return None
 
-    def get_profile_address(self, profile):
+    def get_profile_address(self, profile_idx: int):
+        """
+        Find the current starting address of profile 1,2 or 3, by summing the size of all headers
+        and content of previous profiles.
+        """
         header = len(TexBinaryBuilder.binary_header) + 2
         profiles = TexBinaryBuilder.ENTRY_SIZE * len(self.config().profiles)
         macros = TexBinaryBuilder.ENTRY_SIZE * 0  # This would be the number of macros that we have
         length = header + profiles + macros
-        for i in range(0, profile):
-            length += (self.config().profileLen() * self.config().layerCount(profile) * TexBinaryBuilder.ENTRY_SIZE)
-            length += self.config().fnCount(profile) * TexBinaryBuilder.FN_LAYER_CONFIG_SIZE
+        for i in range(0, profile_idx):
+            length += (self.config().profileLen() * self.config().layerCount(i) * TexBinaryBuilder.ENTRY_SIZE)
+
+            """ The lenght of each fn layer will always be the same regardles of the number of bindings
+            so all that we have to do is to count the number of enabled layers. """
+            length += self.config().fnCount(profile_idx) * TexBinaryBuilder.FN_LAYER_CONFIG_SIZE
 
         return length
 
@@ -359,8 +369,8 @@ class TexBinaryBuilder:
             As well as the starting address of any configured macros.
             Macros are not configured per profile.
         """
-        profile_section_byte_offset = self.get_profile_address(profile_idx - 1)
-        profile_field_key = bytearray([0x00, profile_idx])
+        profile_section_byte_offset = self.get_profile_address(profile_idx)
+        profile_field_key = bytearray([0x00, profile_idx + 1])
         seperator = bytearray([0x00, 0x00])
         return profile_field_key + seperator + bytearray(profile_section_byte_offset.to_bytes(2, "little")) + seperator
 
@@ -410,14 +420,14 @@ class TexBinaryBuilder:
     def binaryGenerate(self, filename):
 
         with open(filename, "wb") as file:
-            file.write(TexBinaryBuilder.binary_header)
+            file.write(self.binary_header)
 
             file.write(self.writeHeadMetaDataEntriesCount())
 
             for index, profile in enumerate(self.config().profiles):
                 length = self.get_profile_address(index)
                 print(f"Hej {hex(length)}")
-                file.write(self.gen_profile_and_macro_meta_data(index + 1))
+                file.write(self.gen_profile_and_macro_meta_data(index))
 
             for profile_idx, profile in enumerate(self.config().profiles):
                 for i in range(1, 5):
