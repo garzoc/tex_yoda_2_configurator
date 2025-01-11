@@ -1,14 +1,24 @@
-# Tex Yoda 2 open source configurator
+# Tex Keyboard Configurator
 
-This project is a open source version of Tex's proprietary web configurator for the model **tex yoda 2**
+This is an open source alternative to the proprietary web configurator\
+for Tex keyboards, such as the `yoda2`.
+> **This project is in no way affiliated with TEX Electronics.**
 
 ## Goal
 
-The goal is to reverse engineer the .TEX binary format, in order to write a program that will allow keyboard owners to \
-configure their keyboard without the web configurator. \
-The benefit is that it will still be possible to configure the keyboard after ther servers disappear\
-as well as adding features not present in the web version such a the
-possiblity to modify you're current config.
+The goal is to reverse engineer the .TEX binary format and develop a tools to allow keyboard owners to \
+configure their keyboard locally without the web configurator.
+
+It begun out of concern that the server may be shutdown in the future, and also\
+providing a way for keyboard owners to improve the user experience with their\
+own software and adding features such a persistent configuration.
+
+Though this started out with the intention to only support the Yoda2,\
+the aim is now to support the following keyboard models:
+
+* Yoda2
+* Shura
+* Shinobi
 
 ## Repo structure
 
