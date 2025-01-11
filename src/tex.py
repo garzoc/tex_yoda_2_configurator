@@ -28,9 +28,6 @@ class TexProfile(int, Enum):
 
 class TexConfigurator:
     keybindings = [
-        TexConfBinding("[", 0x2f00, 0, True),
-        TexConfBinding("\\", 0x3100, 0, True),
-        TexConfBinding("]", 0x3000, 0, True),
         TexConfBinding("a", 0x0400, 0x34, True),  # 00000100: 00110100
         TexConfBinding("b", 0x0500, 0x01, True),  # 00000101: 00000001
         TexConfBinding("c", 0x0600, 0x32, True),  # 00000110: 00110010
@@ -57,39 +54,33 @@ class TexConfigurator:
         TexConfBinding("x", 0x1b00, 0x2a, True),
         TexConfBinding("y", 0x1c00, 0x2d, True),
         TexConfBinding("z", 0x1d00, 0x22, True),
-        TexConfBinding("-", 0x2d00, 0, True),
-        TexConfBinding("=", 0x2e00, 0, True),
-        TexConfBinding("'", 0x3400, 0, True),
-        TexConfBinding(",", 0x3600, 0, True),
-        TexConfBinding(".", 0x3700, 0, True),
-        TexConfBinding(";", 0x3300, 0, True),
-        TexConfBinding("1", 0x1e00, 0, True),
-        TexConfBinding("2", 0x1f00, 0, True),
-        TexConfBinding("3", 0x2000, 0, True),
-        TexConfBinding("4", 0x2100, 0, True),
-        TexConfBinding("5", 0x2200, 0, True),
-        TexConfBinding("6", 0x2300, 0, True),
-        TexConfBinding("7", 0x2400, 0, True),
-        TexConfBinding("8", 0x2500, 0, True),
-        TexConfBinding("9", 0x2600, 0, True),
-        TexConfBinding("0", 0x2700, 0, True),
-        TexConfBinding("/", 0x3800, 0, True),
-        TexConfBinding("fn", 0xe600, 0x20, True),
-        TexConfBinding("middle_mouse", 0xc900, 0x46, True),
-        TexConfBinding("spacebar", 0x2c00, 0, True),
-        TexConfBinding("capslock", 0x3900, 0, True),
-        TexConfBinding("backspace", 0x2a00, 0, True),
-        TexConfBinding("left_control", 0xe000, 0, True),
-        TexConfBinding("right_control", 0xe400, 0, True),
-        TexConfBinding("right_win", 0x6500, 0, False),
-        TexConfBinding("left_win", 0xe300, 0, False),
-        TexConfBinding("esc", 0x2900, 0, True),
-        TexConfBinding("left_shift", 0xe100, 0, True),
-        TexConfBinding("right_shift", 0xe500, 0, True),
-        TexConfBinding("enter", 0x2800, 0, True),
-        TexConfBinding("led-", 0x9201, 0, False),
-        TexConfBinding("led+", 0x9301, 0, False),
-        TexConfBinding("led_on/off", 0x8001, 0, False),
+        TexConfBinding("1", 0x1e00, 0x0f, True),
+        TexConfBinding("2", 0x1f00, 0x17, True),
+        TexConfBinding("3", 0x2000, 0x1f, True),
+        TexConfBinding("4", 0x2100, 0x27, True),
+        TexConfBinding("5", 0x2200, 0x2f, True),
+        TexConfBinding("6", 0x2300, 0x37, True),
+        TexConfBinding("7", 0x2400, 0x3f, True),
+        TexConfBinding("8", 0x2500, 0x06, True),
+        TexConfBinding("9", 0x2600, 0x0e, True),
+        TexConfBinding("0", 0x2700, 0x16, True),
+        TexConfBinding("enter", 0x2800, 0x0a, True),
+        TexConfBinding("esc", 0x2900, 0x07, True),
+        TexConfBinding("backspace", 0x2a00, 0x36, True),
+        TexConfBinding("tab", 0x2b00, 0x3e, True),
+        TexConfBinding("spacebar", 0x2c00, 0x18, True),
+        TexConfBinding("-", 0x2d00, 0x1e, True),
+        TexConfBinding("=", 0x2e00, 0x26, True),
+        TexConfBinding("[", 0x2f00, 0x14, True),
+        TexConfBinding("]", 0x3000, 0x1c, True),
+        TexConfBinding("\\", 0x3100, 0x24, True),
+        TexConfBinding(";", 0x3300, 0x3b, True),
+        TexConfBinding("'", 0x3400, 0x02, True),
+        TexConfBinding("`", 0x3500, 0x2e, False),  # Can be enabled in DIY config split backspace
+        TexConfBinding(",", 0x3600, 0x19, True),
+        TexConfBinding(".", 0x3700, 0x21, True),
+        TexConfBinding("/", 0x3800, 0x29, True),
+        TexConfBinding("capslock", 0x3900, 0x2c, True),
         TexConfBinding("f1", 0x3a00, 0, False),
         TexConfBinding("f2", 0x3b00, 0, False),
         TexConfBinding("f3", 0x3c00, 0, False),
@@ -102,35 +93,45 @@ class TexConfigurator:
         TexConfBinding("f10", 0x4300, 0, False),
         TexConfBinding("f11", 0x4400, 0, False),
         TexConfBinding("f12", 0x4500, 0, False),
-        TexConfBinding("left", 0x5000, 0, False),
-        TexConfBinding("right", 0x4f00, 0, False),
-        TexConfBinding("down", 0x5100, 0, False),
-        TexConfBinding("up", 0x5200, 0, False),
-        TexConfBinding("end", 0x4d00, 0, False),
-        TexConfBinding("home", 0x4a00, 0, False),
-        TexConfBinding("pageUp", 0x4b00, 0, False),
-        TexConfBinding("pageDown", 0x4e00, 0, False),
-        TexConfBinding("play/pause", 0xf000, 0, False),
-        TexConfBinding("pause", 0x4800, 0, False),
-        TexConfBinding("prev", 0xf200, 0, False),
-        TexConfBinding("next", 0xf300, 0, False),
-        TexConfBinding("vol+", 0xf600, 0, False),
-        TexConfBinding("vol-", 0xf500, 0, False),
-        TexConfBinding("mute", 0xf400, 0, False),
-        TexConfBinding("speed+", 0x3a01, 0, False),
-        TexConfBinding("speed-", 0x3001, 0, False),
-        TexConfBinding("ins", 0x4900, 0, False),
-        TexConfBinding("disable", 0xFF00, 0xFF, False),
-        TexConfBinding("`", 0x3500, 0, False),  # Guessed ?
-        TexConfBinding("del", 0x4c00, 0, False),
         TexConfBinding("PrtSc", 0x4600, 0, False),
         TexConfBinding("ScrLk", 0x4700, 0, False),
-        TexConfBinding("0x2b00", 0x2b00, 0, False),
-        TexConfBinding("0x9301", 0x9301, 0, False),
-        TexConfBinding("0xe700", 0xe700, 0, False),
-        TexConfBinding("0xe200", 0xe200, 0, False),
-        TexConfBinding("0xc800", 0xc800, 0, False),
-        TexConfBinding("0xca00", 0xca00, 0, False),
+        TexConfBinding("pause", 0x4800, 0, False),
+        TexConfBinding("ins", 0x4900, 0, False),
+        TexConfBinding("home", 0x4a00, 0, False),
+        TexConfBinding("pageUp", 0x4b00, 0, False),
+        TexConfBinding("del", 0x4c00, 0, False),
+        TexConfBinding("end", 0x4d00, 0, False),
+        TexConfBinding("pageDown", 0x4e00, 0, False),
+        TexConfBinding("left", 0x5000, 0, False),
+        TexConfBinding("down", 0x5100, 0, False),
+        TexConfBinding("up", 0x5200, 0, False),
+        TexConfBinding("left_mouse", 0xc800, 0x45, True),  # Can this value be bound to another key?
+        TexConfBinding("middle_mouse", 0xc900, 0x46, True),  # Does rebinding change the default scroll behavior?
+        TexConfBinding("right_mouse", 0xca00, 0x47, True),
+        TexConfBinding("left_control", 0xe000, 0x00, True),
+        TexConfBinding("left_shift", 0xe100, 0x12, True),
+        TexConfBinding("left_alt", 0xe200, 0x10, True),
+        TexConfBinding("left_win", 0xe300, 0x08, True),
+        TexConfBinding("right_control", 0xe400, 0x38, True),
+        TexConfBinding("right_shift", 0xe500, 0x31, True),
+        TexConfBinding("fn", 0xe600, 0x20, True),
+        TexConfBinding("right_alt", 0xe700, 0x28, True),
+        TexConfBinding("right_win", 0x6500, 0x30, True),
+        TexConfBinding("middle_mouse_click", 0xf201, 0, False),
+        TexConfBinding("left_mouse_click", 0xf001, 0, False),
+        TexConfBinding("led-", 0x9201, 0, False),
+        TexConfBinding("led+", 0x9301, 0, False),
+        TexConfBinding("led_on/off", 0x8001, 0, False),
+        TexConfBinding("right", 0x4f00, 0, False),
+        TexConfBinding("play/pause", 0xf000, 0, False),
+        TexConfBinding("prev", 0xf200, 0, False),
+        TexConfBinding("next", 0xf300, 0, False),
+        TexConfBinding("mute", 0xf400, 0, False),
+        TexConfBinding("vol-", 0xf500, 0, False),
+        TexConfBinding("vol+", 0xf600, 0, False),
+        TexConfBinding("speed+", 0x3a01, 0, False),
+        TexConfBinding("speed-", 0x3001, 0, False),
+        TexConfBinding("disable", 0xFF00, 0xFF, False),  # When binding to fn layer then should we really disable?
     ]
 
     def __init__(self):
@@ -138,10 +139,10 @@ class TexConfigurator:
         self.profiles = [
             {
                 "layers": {
-                    TexLayer.NORMAL: {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN1:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN2:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN3:    {"right_win": "0xe700", "0xe700": "fn"},
+                    TexLayer.NORMAL: {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN1:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN2:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN3:    {"right_win": "right_alt", "right_alt": "fn"},
                 },
                 "fn": {
                     # Default configuration  when enabling the FN1 layer
@@ -150,10 +151,10 @@ class TexConfigurator:
             },
             {
                 "layers": {
-                    TexLayer.NORMAL: {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN1:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN2:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN3:    {"right_win": "0xe700", "0xe700": "fn"},
+                    TexLayer.NORMAL: {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN1:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN2:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN3:    {"right_win": "right_alt", "right_alt": "fn"},
                 },
                 "fn": {
                     # Default configuration  when enabling the FN1 layer
@@ -162,10 +163,10 @@ class TexConfigurator:
             },
             {
                 "layers": {
-                    TexLayer.NORMAL: {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN1:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN2:    {"right_win": "0xe700", "0xe700": "fn"},
-                    TexLayer.FN3:    {"right_win": "0xe700", "0xe700": "fn"},
+                    TexLayer.NORMAL: {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN1:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN2:    {"right_win": "right_alt", "right_alt": "fn"},
+                    TexLayer.FN3:    {"right_win": "right_alt", "right_alt": "fn"},
                 },
                 "fn": {
                     # Default configuration  when enabling the FN1 layer
@@ -177,8 +178,8 @@ class TexConfigurator:
         # Keys that does not exist within the default TEX binary file
         # Leaving them here until it can be determined what they are.
         self.unsupportedKeys = [
-            0x32,  # Unknown what these keys are
-            0x35,  # Unknown what these keys are
+            0x32,  # Unknown what this key is
+            0x35,  # This key is only available if the users has a DIY split backspace key
         ] + list(range(0x3a, 0x65)) + list(range(0x66, 0xc8)) + list(range(0xcb, 0xe0))
 
         # self.binary_header = bytearray([0x43, 0x59, 0x46, 0x49, 0x00, 0x00])
@@ -241,6 +242,9 @@ class TexConfigurator:
         return result[0]
 
     def addConfigEntry(self, profile: TexProfile, layer: TexLayer, key: str, value: str):
+        for fn_layer in TexFnLayer:
+            self.removeConfigFnEntry(profile, fn_layer, key)
+
         profile_map: dict = self.profiles[profile]
         layer_map = profile_map["layers"].get(layer)
 
@@ -252,7 +256,55 @@ class TexConfigurator:
         if not key_binding or not value_binding:
             return
 
+        # self.isKeyMapped(profile, key_binding)
         layer_map[key] = value
+
+    def isKeyMapped(self, profile: TexProfile, key_binding: TexConfBinding):
+        profile_map = self.profiles[profile]
+
+        for layer in profile_map["layers"]:
+            if key_binding.name in profile_map["layers"][layer]:
+                print(f"Found existing binding for {key_binding.name}")
+
+        for fn_layer in profile_map["fn"]:
+            if key_binding.name in profile_map["layers"][fn_layer]:
+                print(f"Found existing binding for {key_binding.name}")
+
+    def removeConfigFnEntry(self, profile: TexProfile, fn_layer: TexFnLayer, key: str):
+        profile_map: dict = self.profiles[profile]
+        key_binding = self.getBinding(key)
+
+        """
+        Only accept the new config if there is a binding for that key & value
+        """
+        if not key_binding:
+            return
+
+        fn_layer_map = profile_map["fn"].get(fn_layer, [])
+        fn_layer_map = list(filter(lambda x: x != key, fn_layer_map))
+
+        if len(fn_layer_map) > 0:
+            profile_map["fn"][fn_layer] = fn_layer_map
+        elif profile_map["fn"].get(fn_layer):
+            del profile_map["fn"][fn_layer]
+
+    def addConfigFnEntry(self, profile: TexProfile, fn_layer: TexFnLayer, key: str):
+        for layer in TexLayer:
+            self.addConfigEntry(profile, layer, key, "disable")
+
+        profile_map: dict = self.profiles[profile]
+
+        key_binding = self.getBinding(key)
+
+        """
+        Only accept the new config if there is a binding for that key & value
+        """
+        if not key_binding or not key_binding.bindable:
+            return
+
+        fn_layer_map = profile_map["fn"].get(fn_layer, [])
+        fn_layer_map.append(key)
+        profile_map["fn"][fn_layer] = fn_layer_map
 
     def keyIterator(self):
         for i in range(0x04, 0xe8):
@@ -333,6 +385,7 @@ class TexBinaryBuilder:
             Macros are not configured per profile.
         """
         profile_section_byte_offset = self.get_profile_address(profile)
+        print(f"Offset is {profile_section_byte_offset}")
         profile_field_key = bytearray([0x00, profile + 1])
         seperator = bytearray([0x00, 0x00])
         return profile_field_key + seperator + bytearray(profile_section_byte_offset.to_bytes(2, "little")) + seperator
@@ -364,8 +417,7 @@ class TexBinaryBuilder:
             key_count = bytearray([0x00 + used_keys, 0x00])
             keys = bytearray(key_fn_codes)
             padding = bytearray([0xFF] * unsued)
-            end = bytearray([0x00] * 8)
-            fn_byte_array += start + key_count + keys + padding + end
+            fn_byte_array += start + key_count + keys + padding
         return fn_byte_array
 
     def writeHeadMetaDataEntriesCount(self):
@@ -409,13 +461,16 @@ class TexBinaryBuilder:
                 After writing all layers, generate the fn layer switcher binding
                 """
                 file.write(self.getFnConf(TexProfile(profile_idx)))
+                # Terminate bytes for the profile
+                file.write(bytearray([0x00] * 8))
 
             file.write(bytearray([0xff] * (317 * 16 + 8)))
 
 
 def init():
     texConfiguration = TexConfigurator()
-    texConfiguration.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
+    # texConfiguration.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
+    texConfiguration.addConfigFnEntry(TexProfile.PROFILE_1, TexFnLayer.FN_LAYER2, "b")
     texBuilder = TexBinaryBuilder(texConfiguration)
 
     texBuilder.binaryGenerate("KEYMAP.TEX")
