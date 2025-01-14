@@ -35,7 +35,7 @@ class TexBinaryBuilder:
 
         return None
 
-    def get_profile_address(self, profile: TexProfile):
+    def getProfileAddress(self, profile: TexProfile):
         """
         Find the current starting address of profile 1,2 or 3, by summing the size of all headers
         and content of previous profiles.
@@ -54,33 +54,31 @@ class TexBinaryBuilder:
 
         return length
 
-    def gen_profile_and_macro_meta_data(self, profile: TexProfile) -> bytearray:
+    def genProfileAndMacroMetaData(self, profile: TexProfile) -> bytearray:
         """
             Write meta data in the header.
             This includes the starting address of each profile.
             As well as the starting address of any configured macros.
             Macros are not configured per profile.
         """
-        profile_section_byte_offset = self.get_profile_address(profile)
+        profile_section_byte_offset = self.getProfileAddress(profile)
         profile_field_key = bytearray([0x00, profile + 1])
         seperator = bytearray([0x00, 0x00])
         return profile_field_key + seperator + bytearray(profile_section_byte_offset.to_bytes(2, "little")) + seperator
 
-    def getFnConf(self, profile_idx: TexProfile) -> bytearray:
+    def getFnConf(self, profile: TexProfile) -> bytearray:
         """
             Generate the binary data for configuration of keys that are used to change the current FN layer
         """
-        profile_map: dict = self.config.profiles[profile_idx]
-        fn_map = profile_map["fn"]
-        print(fn_map)
+        print(self.config.getFnLayers(profile))
         fn_byte_array = bytearray()
         fn_layer: TexFnLayer = TexFnLayer.FN_LAYER1
-        for fn_layer in fn_map:
+        for fn_layer in self.config.getFnLayers(profile):
 
             used_keys = 0
             key_fn_codes = []
 
-            for key in fn_map[fn_layer]:
+            for key in self.config.getFnMap(profile, fn_layer):
                 binding = self.config.getKeyDeclaration(key)
                 if binding:
                     used_keys += 1
@@ -125,7 +123,7 @@ class TexBinaryBuilder:
             file.write(self.writeHeadMetaDataEntriesCount())
 
             for profile_idx, _ in enumerate(self.config.profiles):
-                file.write(self.gen_profile_and_macro_meta_data(TexProfile(profile_idx)))
+                file.write(self.genProfileAndMacroMetaData(TexProfile(profile_idx)))
 
             for profile_idx, _ in enumerate(self.config.profiles):
                 for i in range(1, 5):  # Write each layer starting at 1 stopping at 0

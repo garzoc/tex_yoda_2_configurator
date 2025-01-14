@@ -31,47 +31,49 @@ class TexConfigurator(ABC):
 
     def __init__(self):
         # Define the configuration scheme and include the default configuration
-        self.profiles = [
-            {
-                "layers": {
-                    TexLayer.NORMAL: {},
-                    TexLayer.FN1:    {},
-                    TexLayer.FN2:    {},
-                    TexLayer.FN3:    {},
-                },
-                "fn": {
-                    TexFnLayer.FN_LAYER1: [],
-                }
+        self.profiles = [{
+            "layers": {
+                TexLayer.NORMAL: {},
+                TexLayer.FN1: {},
+                TexLayer.FN2: {},
+                TexLayer.FN3: {},
             },
-            {
-                "layers": {
-                    TexLayer.NORMAL: {},
-                    TexLayer.FN1:    {},
-                    TexLayer.FN2:    {},
-                    TexLayer.FN3:    {},
-                },
-                "fn": {
-                    TexFnLayer.FN_LAYER1: [],
-                }
-            },
-            {
-                "layers": {
-                    TexLayer.NORMAL: {},
-                    TexLayer.FN1:    {},
-                    TexLayer.FN2:    {},
-                    TexLayer.FN3:    {},
-                },
-                "fn": {
-                    TexFnLayer.FN_LAYER1: [],
-                }
+            "fn": {
+                TexFnLayer.FN_LAYER1: [],
             }
-        ]
+        }, {
+            "layers": {
+                TexLayer.NORMAL: {},
+                TexLayer.FN1: {},
+                TexLayer.FN2: {},
+                TexLayer.FN3: {},
+            },
+            "fn": {
+                TexFnLayer.FN_LAYER1: [],
+            }
+        }, {
+            "layers": {
+                TexLayer.NORMAL: {},
+                TexLayer.FN1: {},
+                TexLayer.FN2: {},
+                TexLayer.FN3: {},
+            },
+            "fn": {
+                TexFnLayer.FN_LAYER1: [],
+            }
+        }]
 
-    def getProfileMap(self, profile: TexProfile) -> dict:
+    def getProfileMap(self, profile: TexProfile):
         return self.profiles[profile]
 
-    def getLayerMap(self, profile: TexProfile, layer: TexLayer) -> dict:
+    def getLayerMap(self, profile: TexProfile, layer: TexLayer) -> dict[str | int, str | int]:
         return self.getProfileMap(profile)["layers"][layer]
+
+    def getFnLayers(self, profile: TexProfile) -> dict[TexFnLayer, list[str | int]]:
+        return self.getProfileMap(profile)["fn"]
+
+    def getFnMap(self, profile: TexProfile, fn_layer: TexFnLayer) -> list[str | int]:
+        return self.getProfileMap(profile)["fn"][fn_layer]
 
     def getKeyDeclarations(self, *keys: str | int) -> list[TexConfKeyDecl | None]:
         result = list(filter(lambda x: x.name in keys or x.code in keys, self.keyDeclarations))
