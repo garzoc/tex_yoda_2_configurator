@@ -3,7 +3,7 @@ from collections import namedtuple
 from abc import ABC, abstractmethod
 from typing import Generator, Any
 
-TexConfBinding = namedtuple("TexConfBinging", ['name', 'code', 'fn', 'bindable'])
+TexConfKeyDecl = namedtuple("TexConfBinging", ['name', 'code', 'fn', 'bindable'])
 
 
 class TexLayer(int, Enum):
@@ -26,7 +26,7 @@ class TexProfile(int, Enum):
 
 
 class TexConfigurator(ABC):
-    keybindings: list[TexConfBinding] = []
+    keyDeclarations: list[TexConfKeyDecl] = []
     unsupportedKeys: list[int] = []
 
     def __init__(self):
@@ -67,25 +67,31 @@ class TexConfigurator(ABC):
             }
         ]
 
-    def getBindings(self, *keys: str | int) -> list[TexConfBinding | None]:
-        result = list(filter(lambda x: x.name in keys or x.code in keys, self.keybindings))
+    def getProfileMap(self, profile: TexProfile) -> dict:
+        return self.profiles[profile]
+
+    def getLayerMap(self, profile: TexProfile, layer: TexLayer) -> dict:
+        return self.getProfileMap(profile)["layers"][layer]
+
+    def getKeyDeclarations(self, *keys: str | int) -> list[TexConfKeyDecl | None]:
+        result = list(filter(lambda x: x.name in keys or x.code in keys, self.keyDeclarations))
         assert len(keys) >= len(result), f"Duplicate entires in key map, keys searched: {keys}"
         return result + [None] * (len(keys) - len(result))
 
-    def getBinding(self, key: str | int) -> TexConfBinding | None:
+    def getKeyDeclaration(self, key: str | int | None) -> TexConfKeyDecl | None:
         if not key:
             return None
-        result = self.getBindings(key)
+        result = self.getKeyDeclarations(key)
         return result[0]
 
-    def addConfigEntry(self, profile: TexProfile, layer: TexLayer, key: str, value: str):
+    def addConfigEntry(self, profile: TexProfile, layer: TexLayer, key: str | int, value: str | int):
         for fn_layer in TexFnLayer:
             self.removeConfigFnEntry(profile, fn_layer, key)
 
         profile_map: dict = self.profiles[profile]
         layer_map = profile_map["layers"].get(layer)
 
-        key_binding, value_binding = self.getBindings(key, value)
+        key_binding, value_binding = self.getKeyDeclarations(key, value)
 
         """
         Only accept the new config if there is a binding for that key & value
@@ -100,7 +106,7 @@ class TexConfigurator(ABC):
         profile_map: dict = self.profiles[profile]
         layer_map = profile_map["layers"].get(layer)
 
-        key_binding = self.getBinding(key)
+        key_binding = self.getKeyDeclaration(key)
 
         """
         Only accept the new config if there is a binding for that key
@@ -110,7 +116,7 @@ class TexConfigurator(ABC):
 
         del layer_map[key]
 
-    def isKeyMapped(self, profile: TexProfile, key_binding: TexConfBinding):
+    def isKeyMapped(self, profile: TexProfile, key_binding: TexConfKeyDecl):
         profile_map = self.profiles[profile]
 
         for layer in profile_map["layers"]:
@@ -121,9 +127,9 @@ class TexConfigurator(ABC):
             if key_binding.name in profile_map["layers"][fn_layer]:
                 print(f"Found existing binding for {key_binding.name}")
 
-    def removeConfigFnEntry(self, profile: TexProfile, fn_layer: TexFnLayer, key: str):
+    def removeConfigFnEntry(self, profile: TexProfile, fn_layer: TexFnLayer, key: str | int):
         profile_map: dict = self.profiles[profile]
-        key_binding = self.getBinding(key)
+        key_binding = self.getKeyDeclaration(key)
 
         """
         Only accept the new config if there is a binding for that key & value
@@ -145,17 +151,34 @@ class TexConfigurator(ABC):
 
         profile_map: dict = self.profiles[profile]
 
-        key_binding = self.getBinding(key)
+        key_decl = self.getKeyDeclaration(key)
 
         """
         Only accept the new config if there is a binding for that key & value
         """
-        if not key_binding or not key_binding.bindable:
+        if not key_decl or not key_decl.bindable:
+            print(f"Could not bind {key_decl}")
             return
 
         fn_layer_map = profile_map["fn"].get(fn_layer, [])
         fn_layer_map.append(key)
         profile_map["fn"][fn_layer] = fn_layer_map
+
+    """
+    Find from the key binding return the value binding it is supposed to be mapped to according
+    to the current configuration.
+    """
+    def getLayerKeyBinding(self, profile: TexProfile, layer: TexLayer,
+                           key: TexConfKeyDecl | None) -> TexConfKeyDecl | None:
+
+        if not key:
+            return key
+
+        layer_map = self.getLayerMap(profile, layer)
+        target_str: str | int | None = layer_map.get(key.name) or layer_map.get(key.code)
+        target_binding: TexConfKeyDecl | None = self.getKeyDeclaration(target_str)
+
+        return target_binding
 
     @abstractmethod
     def keyIterator(self) -> Generator[int, Any, Any]:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from TexConfig import TexProfile, TexLayer, TexFnLayer, TexConfBinding, TexConfigurator
+from TexConfig import TexProfile, TexLayer, TexFnLayer, TexConfKeyDecl, TexConfigurator
 from TexConfig.yoda2 import TexConfiguratorYoda2
 from TexConfig.shura import TexConfiguratorShura
 from TexConfig.shinobi import TexConfiguratorShinobi
@@ -18,25 +18,20 @@ class TexBinaryBuilder:
     def config(self) -> TexConfigurator:
         return self.texConfig
 
-    def get_mapped_value(self, key: int, profile: TexProfile, layer_idx: int, value=None, default=True):
+    def getMappedValue(self, key: int, profile: TexProfile, layer: TexLayer, value=None, default=True):
         if value is None:
             value = key
-        profile_map: dict = self.config.profiles[profile]
-        layer_map = profile_map["layers"][TexLayer(layer_idx)]
 
         config_key = (key << 8)
-        binding: TexConfBinding | None = self.config.getBinding(config_key)
+        key_decl: TexConfKeyDecl | None = self.config.getKeyDeclaration(config_key)
+        map_to: TexConfKeyDecl | None = self.config.getLayerKeyBinding(profile, layer, key_decl)
 
-        if binding:
-            remap_target: str = layer_map.get(binding.name)
-            target_binding: TexConfBinding | None = self.config.getBinding(remap_target)
+        if map_to:
+            return bytearray([0x02, 0x20, key, layer] + list(map_to.code.to_bytes(2, "big")) + [0x00, 0x00])
 
-            if target_binding:
-                return bytearray([0x02, 0x20, key, layer_idx] + list(target_binding.code.to_bytes(2, "big")) +
-                                 [0x00, 0x00])
         if default:
             # With not config available fallback on default value
-            return bytearray([0x02, 0x20, key, layer_idx, value, 0x00, 0x00, 0x00])
+            return bytearray([0x02, 0x20, key, layer, value, 0x00, 0x00, 0x00])
 
         return None
 
@@ -86,7 +81,7 @@ class TexBinaryBuilder:
             key_fn_codes = []
 
             for key in fn_map[fn_layer]:
-                binding = self.config.getBinding(key)
+                binding = self.config.getKeyDeclaration(key)
                 if binding:
                     used_keys += 1
                     key_fn_codes.append(binding.fn)
@@ -135,7 +130,7 @@ class TexBinaryBuilder:
             for profile_idx, _ in enumerate(self.config.profiles):
                 for i in range(1, 5):  # Write each layer starting at 1 stopping at 0
                     for key in self.config.keyIterator():
-                        data = self.get_mapped_value(key, TexProfile(profile_idx), i % 4)
+                        data = self.getMappedValue(key, TexProfile(profile_idx), TexLayer(i % 4))
                         if (data):
                             file.write(data)
                 """
@@ -153,12 +148,12 @@ def init():
     shura: TexConfigurator = TexConfiguratorShura()
     shinobi: TexConfigurator = TexConfiguratorShinobi()
 
-    # yoda2.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
-    shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
+    # shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
+    yoda2.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
     shinobi.addConfigEntry(TexProfile.PROFILE_1, TexLayer.NORMAL, "b", "vol-")
     # texConfiguration.addConfigFnEntry(TexProfile.PROFILE_1, TexFnLayer.FN_LAYER2, "b")
 
-    texBuilder = TexBinaryBuilder(yoda2)
+    texBuilder = TexBinaryBuilder(shura)
     texBuilder.binaryGenerate("KEYMAP.TEX")
 
 
