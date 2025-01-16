@@ -4,42 +4,42 @@ from TexConfig import TexProfile, TexLayer, TexFnLayer, TexConfKeyDecl, TexConfi
 
 class TexConfiguratorShura(TexConfigurator):
     keyDeclarations = [
-        TexConfKeyDecl("a", 0x0400, 0x34, True),  # Untested, but probably fine
+        TexConfKeyDecl("a", 0x0400, 0x34, True),
         TexConfKeyDecl("b", 0x0500, 0x01, True),
-        TexConfKeyDecl("c", 0x0600, 0x32, True),  # Untested, but probably fine
-        TexConfKeyDecl("d", 0x0700, 0x03, True),  # Untested, but probably fine
-        TexConfKeyDecl("e", 0x0800, 0x15, True),  # Untested, but probably fine
-        TexConfKeyDecl("f", 0x0900, 0x0b, True),  # Untested, but probably fine
-        TexConfKeyDecl("g", 0x0a00, 0x13, True),  # Untested, but probably fine
-        TexConfKeyDecl("h", 0x0b00, 0x1b, True),  # Untested, but probably fine
-        TexConfKeyDecl("i", 0x0c00, 0x3d, True),  # Untested, but probably fine
-        TexConfKeyDecl("j", 0x0d00, 0x23, True),  # Untested, but probably fine
-        TexConfKeyDecl("k", 0x0e00, 0x2b, True),  # Untested, but probably fine
-        TexConfKeyDecl("l", 0x0f00, 0x33, True),  # Untested, but probably fine
-        TexConfKeyDecl("m", 0x1000, 0x11, True),  # Untested, but probably fine
-        TexConfKeyDecl("n", 0x1100, 0x09, True),  # Untested, but probably fine
-        TexConfKeyDecl("o", 0x1200, 0x04, True),  # Untested, but probably fine
-        TexConfKeyDecl("p", 0x1300, 0x0c, True),  # Untested, but probably fine
-        TexConfKeyDecl("q", 0x1400, 0x05, True),  # Untested, but probably fine
-        TexConfKeyDecl("r", 0x1500, 0x1d, True),  # Untested, but probably fine
-        TexConfKeyDecl("s", 0x1600, 0x3c, True),  # Untested, but probably fine
-        TexConfKeyDecl("t", 0x1700, 0x25, True),  # Untested, but probably fine
-        TexConfKeyDecl("u", 0x1800, 0x35, True),  # Untested, but probably fine
-        TexConfKeyDecl("v", 0x1900, 0x3a, True),  # Untested, but probably fine
-        TexConfKeyDecl("w", 0x1a00, 0x0d, True),  # Untested, but probably fine
-        TexConfKeyDecl("x", 0x1b00, 0x2a, True),  # Untested, but probably fine
-        TexConfKeyDecl("y", 0x1c00, 0x2d, True),  # Untested, but probably fine
-        TexConfKeyDecl("z", 0x1d00, 0x22, True),  # Untested, but probably fine
-        TexConfKeyDecl("1", 0x1e00, 0x0f, True),  # Untested, but probably fine
-        TexConfKeyDecl("2", 0x1f00, 0x17, True),  # Untested, but probably fine
-        TexConfKeyDecl("3", 0x2000, 0x1f, True),  # Untested, but probably fine
-        TexConfKeyDecl("4", 0x2100, 0x27, True),  # Untested, but probably fine
-        TexConfKeyDecl("5", 0x2200, 0x2f, True),  # Untested, but probably fine
-        TexConfKeyDecl("6", 0x2300, 0x37, True),  # Untested, but probably fine
-        TexConfKeyDecl("7", 0x2400, 0x3f, True),  # Untested, but probably fine
-        TexConfKeyDecl("8", 0x2500, 0x06, True),  # Untested, but probably fine
-        TexConfKeyDecl("9", 0x2600, 0x0e, True),  # Untested, but probably fine
-        TexConfKeyDecl("0", 0x2700, 0x16, True),  # Untested, but probably fine
+        TexConfKeyDecl("c", 0x0600, 0x32, True),
+        TexConfKeyDecl("d", 0x0700, 0x03, True),
+        TexConfKeyDecl("e", 0x0800, 0x15, True),
+        TexConfKeyDecl("f", 0x0900, 0x0b, True),
+        TexConfKeyDecl("g", 0x0a00, 0x13, True),
+        TexConfKeyDecl("h", 0x0b00, 0x1b, True),
+        TexConfKeyDecl("i", 0x0c00, 0x3d, True),
+        TexConfKeyDecl("j", 0x0d00, 0x23, True),
+        TexConfKeyDecl("k", 0x0e00, 0x2b, True),
+        TexConfKeyDecl("l", 0x0f00, 0x33, True),
+        TexConfKeyDecl("m", 0x1000, 0x11, True),
+        TexConfKeyDecl("n", 0x1100, 0x09, True),
+        TexConfKeyDecl("o", 0x1200, 0x04, True),
+        TexConfKeyDecl("p", 0x1300, 0x0c, True),
+        TexConfKeyDecl("q", 0x1400, 0x05, True),
+        TexConfKeyDecl("r", 0x1500, 0x1d, True),
+        TexConfKeyDecl("s", 0x1600, 0x3c, True),
+        TexConfKeyDecl("t", 0x1700, 0x25, True),
+        TexConfKeyDecl("u", 0x1800, 0x35, True),
+        TexConfKeyDecl("v", 0x1900, 0x3a, True),
+        TexConfKeyDecl("w", 0x1a00, 0x0d, True),
+        TexConfKeyDecl("x", 0x1b00, 0x2a, True),
+        TexConfKeyDecl("y", 0x1c00, 0x2d, True),
+        TexConfKeyDecl("z", 0x1d00, 0x22, True),
+        TexConfKeyDecl("1", 0x1e00, 0x0f, True),
+        TexConfKeyDecl("2", 0x1f00, 0x17, True),
+        TexConfKeyDecl("3", 0x2000, 0x1f, True),
+        TexConfKeyDecl("4", 0x2100, 0x27, True),
+        TexConfKeyDecl("5", 0x2200, 0x2f, True),
+        TexConfKeyDecl("6", 0x2300, 0x37, True),
+        TexConfKeyDecl("7", 0x2400, 0x3f, True),
+        TexConfKeyDecl("8", 0x2500, 0x06, True),
+        TexConfKeyDecl("9", 0x2600, 0x0e, True),
+        TexConfKeyDecl("0", 0x2700, 0x16, True),
         TexConfKeyDecl("enter", 0x2800, 0x0a, True),  # Untested, but probably fine
         TexConfKeyDecl("esc", 0x2900, 0x07, True),  # Untested, but probably fine
         TexConfKeyDecl("backspace", 0x2a00, 0x36, True),  # Untested, but probably fine
@@ -48,11 +48,11 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl("-", 0x2d00, 0x1e, True),  # Untested, but probably fine
         TexConfKeyDecl("=", 0x2e00, 0x26, True),  # Untested, but probably fine
         TexConfKeyDecl("[", 0x2f00, 0x14, True),  # Untested, but probably fine
-        TexConfKeyDecl("]", 0x3000, 0x1c, True),  # Untested, but probably fine
+        TexConfKeyDecl("]", 0x3000, 0x1c, True),  # Untested, but probablcaps_lock fine
         TexConfKeyDecl("\\", 0x3100, 0x24, True),  # Untested, but probably fine
         TexConfKeyDecl(";", 0x3300, 0x3b, True),  # Untested, but probably fine
         TexConfKeyDecl("'", 0x3400, 0x02, True),  # Untested, but probably fine
-        TexConfKeyDecl("`", 0x3500, 0x2e, False),  # Untested, but probably fin
+        TexConfKeyDecl("`", 0x3500, 0, False),  # Untested, but probably fin
         TexConfKeyDecl(",", 0x3600, 0x19, True),  # Untested, but probably fine
         TexConfKeyDecl(".", 0x3700, 0x21, True),  # Untested, but probably fine
         TexConfKeyDecl("/", 0x3800, 0x29, True),  # Untested, but probably fine
@@ -79,18 +79,18 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl("end", 0x4d00, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("pageDown", 0x4e00, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("left", 0x5000, 0x41, True),
-        TexConfKeyDecl("down", 0x5100, 0x4b, True),  # Untested, but probably fine
+        TexConfKeyDecl("down", 0x5100, 0x4b, True),
         TexConfKeyDecl("up", 0x5200, 0x4c, True),
         TexConfKeyDecl("right", 0x4f00, 0x49, True),
         TexConfKeyDecl("left_mouse", 0xb000, 0, True),  # Can this value be bound to another key?
-        TexConfKeyDecl("middle_mouse", 0xb100, 0x46, True),  # Just a best guess since it's not officially remappable
+        TexConfKeyDecl("middle_mouse", 0xb100, 0x46, True),  # FN key cannot be remapped
         TexConfKeyDecl("right_mouse", 0xb200, 0, True),
         TexConfKeyDecl("left_control", 0xe000, 0x00, True),  # Untested
         TexConfKeyDecl("left_shift", 0xe100, 0x12, True),  # Untested
         TexConfKeyDecl("left_alt", 0xe200, 0x10, True),  # Untested
         TexConfKeyDecl("left_win", 0xe300, 0x08, True),  # Untested
-        TexConfKeyDecl("right_control", 0xe400, 0x38, True),  # Untested
-        TexConfKeyDecl("right_shift", 0xe500, 0x31, True),  # Untested
+        TexConfKeyDecl("right_control", 0xe400, 0x40, True),
+        TexConfKeyDecl("right_shift", 0xe500, 0x31, True),
         TexConfKeyDecl("right_alt", 0xe600, 0x30, True),  # Tested
         TexConfKeyDecl("right_win", 0x6500, 0x30, True),  # Untested
         TexConfKeyDecl("middle_mouse_click", 0xf201, 0, False),  # Untested
@@ -104,10 +104,11 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl("speed+", 0x3a01, 0, False),  # Untested
         TexConfKeyDecl("speed-", 0x3001, 0, False),  # Untested
         TexConfKeyDecl("disable", 0xFF00, 0xFF, False),  # When binding to fn layer then should we really disable?
+
+        # When Bound to FN_LAYER1 then caps lock will also be enabled, but for any other FN layer it won't.
         TexConfKeyDecl("fn", 0xce00, 0x2c, True),
 
-        # This appears to be a unique case for enabling capslock on a key that is has been mapped
-        # to fn layer switching
+        # Why is the fn key bound to this by default it is really weird?
         TexConfKeyDecl("?", 0xe800, 0, False),
     ]
 

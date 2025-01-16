@@ -3,7 +3,7 @@ from collections import namedtuple
 from abc import ABC, abstractmethod
 from typing import Generator, Any
 
-TexConfKeyDecl = namedtuple("TexConfBinging", ['name', 'code', 'fn', 'bindable'])
+TexConfKeyDecl = namedtuple("TexConfKeyDecl", ['name', 'code', 'fn', 'bindable'])
 
 
 class TexLayer(int, Enum):
@@ -113,8 +113,10 @@ class TexConfigurator(ABC):
         """
         Only accept the new config if there is a binding for that key
         """
-        if not key_binding or not layer_map.get(key):
+        if not key_binding or (not layer_map.get(key) and not layer_map.get(key_binding.code)):
             return
+
+        key = layer_map.get(key) or key_binding.code
 
         del layer_map[key]
 
@@ -150,6 +152,9 @@ class TexConfigurator(ABC):
     def addConfigFnEntry(self, profile: TexProfile, fn_layer: TexFnLayer, key: str):
         for layer in TexLayer:
             self.removeConfigEntry(profile, layer, key)
+
+        for fn_layer_iter in TexFnLayer:
+            self.removeConfigFnEntry(profile, fn_layer_iter, key)
 
         profile_map: dict = self.profiles[profile]
 
