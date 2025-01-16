@@ -39,6 +39,9 @@ def init():
         shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "tab", "capslock")
         shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "left_mouse", "`")
         shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "esc", "`")
+        shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "p", "play/pause")
+        shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "n", "next")
+        shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "b", "prev")
         texBuilder = TexBinaryBuilder(shura)
         texBuilder.binaryGenerate("KEYMAP.TEX")
 
