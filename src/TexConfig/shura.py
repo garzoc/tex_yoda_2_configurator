@@ -42,7 +42,7 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl("0", 0x2700, 0x16, True),
         TexConfKeyDecl("enter", 0x2800, 0x0a, True),  # Untested, but probably fine
         TexConfKeyDecl("esc", 0x2900, 0x07, True),  # Untested, but probably fine
-        TexConfKeyDecl("backspace", 0x2a00, 0x36, True),  # Untested, but probably fine
+        TexConfKeyDecl("backspace", 0x2a00, 0x36, True),
         TexConfKeyDecl("tab", 0x2b00, 0x3e, True),  # Untested, but probably fine
         TexConfKeyDecl("spacebar", 0x2c00, 0x18, True),  # Untested
         TexConfKeyDecl("-", 0x2d00, 0x1e, True),  # Untested, but probably fine
@@ -57,15 +57,15 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl(".", 0x3700, 0x21, True),  # Untested, but probably fine
         TexConfKeyDecl("/", 0x3800, 0x29, True),  # Untested, but probably fine
         TexConfKeyDecl("capslock", 0x3900, 0, False),
-        TexConfKeyDecl("f1", 0x3a00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f2", 0x3b00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f3", 0x3c00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f4", 0x3d00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f5", 0x3e00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f6", 0x3f00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f7", 0x4000, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f8", 0x4100, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("f9", 0x4200, 0, False),  # Untested, but probably fine
+        TexConfKeyDecl("f1", 0x3a00, 0, False),
+        TexConfKeyDecl("f2", 0x3b00, 0, False),
+        TexConfKeyDecl("f3", 0x3c00, 0, False),
+        TexConfKeyDecl("f4", 0x3d00, 0, False),
+        TexConfKeyDecl("f5", 0x3e00, 0, False),
+        TexConfKeyDecl("f6", 0x3f00, 0, False),
+        TexConfKeyDecl("f7", 0x4000, 0, False),
+        TexConfKeyDecl("f8", 0x4100, 0, False),
+        TexConfKeyDecl("f9", 0x4200, 0, False),
         TexConfKeyDecl("f10", 0x4300, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("f11", 0x4400, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("f12", 0x4500, 0, False),  # Untested, but probably fine
@@ -75,7 +75,7 @@ class TexConfiguratorShura(TexConfigurator):
         TexConfKeyDecl("ins", 0x4900, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("home", 0x4a00, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("pageUp", 0x4b00, 0, False),  # Untested, but probably fine
-        TexConfKeyDecl("del", 0x4c00, 0, False),  # Untested, but probably fine
+        TexConfKeyDecl("del", 0x4c00, 0, False),
         TexConfKeyDecl("end", 0x4d00, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("pageDown", 0x4e00, 0, False),  # Untested, but probably fine
         TexConfKeyDecl("left", 0x5000, 0x41, True),
