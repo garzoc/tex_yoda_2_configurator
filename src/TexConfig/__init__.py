@@ -24,6 +24,23 @@ class TexProfile(int, Enum):
     PROFILE_2 = 1
     PROFILE_3 = 2
 
+class TexMacroOp(int, Enum):
+    UP = 0x5c
+    DOWN = 0x3c
+
+class TexMacro(int, Enum):
+    MACRO_1 = 0
+    MACRO_2 = 1
+    MACRO_3 = 2
+    MACRO_4 = 3
+    MACRO_5 = 4
+    MACRO_6 = 5
+    MACRO_7 = 6
+    MACRO_8 = 7
+    MACRO_9 = 8
+    MACRO_10 = 9
+    MACRO_11 = 10
+    MACRO_12 = 11
 
 class TexConfigurator(ABC):
     keyDeclarations: list[TexConfKeyDecl] = []
@@ -40,7 +57,8 @@ class TexConfigurator(ABC):
             },
             "fn": {
                 TexFnLayer.FN_LAYER1: [],
-            }
+            },
+            "macros": {}
         }, {
             "layers": {
                 TexLayer.NORMAL: {},
@@ -50,7 +68,8 @@ class TexConfigurator(ABC):
             },
             "fn": {
                 TexFnLayer.FN_LAYER1: [],
-            }
+            },
+            "macros":{}
         }, {
             "layers": {
                 TexLayer.NORMAL: {},
@@ -60,7 +79,8 @@ class TexConfigurator(ABC):
             },
             "fn": {
                 TexFnLayer.FN_LAYER1: [],
-            }
+            },
+            "macros":{}
         }]
 
     def getProfileMap(self, profile: TexProfile):
@@ -102,6 +122,19 @@ class TexConfigurator(ABC):
             return
 
         layer_map[key] = value
+
+    def addMacroOp(self, macro: TexMacro,op: TexMacroOp, key: str | int):
+        key_binding = self.getKeyDeclaration(key)
+        for profile in self.profiles:
+
+            if macro != TexMacro.MACRO_1 and not profile["macros"].get(macro - 1):
+                print(f"Can't add macro to {macro} as {TexMacro(macro -1)} hasn't been added")
+                exit(1)
+
+            if not profile["macros"].get(macro):
+                profile["macros"][macro] = []
+
+            profile["macros"][macro].append({"op": op, "key" : key_binding})
 
     def removeConfigEntry(self, profile: TexProfile, layer: TexLayer, key: str):
 
@@ -202,3 +235,9 @@ class TexConfigurator(ABC):
         Get the current number of enabled fn layers.
         """
         return len(self.profiles[profile]["fn"])
+
+    def macroCount(self, profile: TexProfile):
+        """
+        Get the current number of enabled fn layers.
+        """
+        return len(self.profiles[profile]["macros"])

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from enum import Enum
-from TexConfig import TexProfile, TexLayer, TexFnLayer, TexConfigurator
+from TexConfig import TexProfile, TexLayer, TexFnLayer, TexConfigurator, TexMacroOp, TexMacro
 
 from TexConfig.yoda2 import TexConfiguratorYoda2
 from TexConfig.shura import TexConfiguratorShura
@@ -22,6 +22,13 @@ def init():
     config = BoardConfig.SHURA
 
     if config == BoardConfig.SHURA:
+        # shura.addMacroOp(TexMacro.MACRO_1, TexMacroOp.DOWN, "3")
+        # shura.addMacroOp(TexMacro.MACRO_1, TexMacroOp.UP, "3")
+        # shura.addMacroOp(TexMacro.MACRO_2, TexMacroOp.DOWN, "4")
+        # shura.addMacroOp(TexMacro.MACRO_2, TexMacroOp.UP, "4")
+
+        # Binding Shura's fn key to fn layer 2, disables the caps-lock functionally
+        # binding to layer1 will keep the functionality
         shura.addConfigFnEntry(TexProfile.PROFILE_1, TexFnLayer.FN_LAYER2, "fn")
         shura.addConfigFnEntry(TexProfile.PROFILE_1, TexFnLayer.FN_LAYER2, "right_shift")
         shura.addConfigEntry(TexProfile.PROFILE_1, TexLayer.FN2, "e", "vol+")
